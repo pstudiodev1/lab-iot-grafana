@@ -34,7 +34,7 @@ services:
         networks:
             - monitoring
         volumes:
-            - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+            - ./data/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
 
     grafana:
         container_name: grafana
