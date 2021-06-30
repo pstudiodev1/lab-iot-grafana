@@ -4,26 +4,35 @@ services:
 
     influxdb:
         container_name: influxdb
-        image: influxdb:latest
+        image: influxdb:1.8
         ports:
-            - '8086:8086'
+            - "8086:8086"
         networks:
-            - monitoring
+            - network_prod
         volumes:
             - ./data/influxdb:/var/lib/influxdb
         environment:
-            - INFLUXDB_DB=db
-            # - INFLUXDB_ADMIN_USER=${INFLUXDB_USERNAME}
-            # - INFLUXDB_ADMIN_PASSWORD=${INFLUXDB_PASSWORD}
+            - INFLUXDB_DB=${INFLUXDB_DATABASE}
+            # - INFLUXDB_USER=grafana
+            # - INFLUXDB_USER_PASSWORD=${INFLUXDB_PASSWORD}
+            - INFLUXDB_ADMIN_USER=${INFLUXDB_USERNAME}
+            - INFLUXDB_ADMIN_PASSWORD=${INFLUXDB_PASSWORD}
+            - INFLUXDB_ADMIN_ENABLE=true
 
     mosquitto:
         container_name: mosquitto
         image: eclipse-mosquitto:latest
         ports:
-            - 9001:9001
-            - 10883:1883
+            - "9001:9001"
+            - "10883:1883"
+            - "10884:1884"
         networks:
-            - monitoring
+            - network_prod
+        volumes:
+            - ./data/mosquitto/data:/mosquitto/data
+            # - ./data/mosquitto/logs:/mosquitto/logs
+            - ./data/mosquitto/config:/mosquitto/config
+            - ./data/mosquitto/authen:/mosquitto/authen
 
     telegraf:
         container_name: telegraf
@@ -32,7 +41,7 @@ services:
             - influxdb
             - mosquitto
         networks:
-            - monitoring
+            - network_prod
         volumes:
             - ./data/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
 
@@ -44,7 +53,7 @@ services:
         ports: 
             - "3000:3000"
         networks:
-            - monitoring
+            - network_prod
         volumes:
             - ./data/grafana:/var/lib/grafana
         environment:
@@ -52,4 +61,4 @@ services:
             - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
 
 networks:
-    monitoring:
+    network_prod:
